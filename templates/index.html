@@ -105,16 +105,16 @@
           });
         });
       }
-      update_map(Date.parse("2014/05/01") / 1000,
-      Date.parse("2014/05/30") / 1000);
+      update_map(Date.parse("2014/05/02") / 1000,
+        Date.parse("2014/05/30") / 1000);
       $("button#submit").click(function (){
-        var earliest_starttime = Date.parse("2014/05/01") / 1000;
-        var latest_endtime = Date.parse("2014/06/01") / 1000;
+        var earliest_starttime = Date.parse("2014/05/02") / 1000;
+        var latest_endtime = Date.parse("2014/05/30") / 1000;
         var starttime = Date.parse($("input#starttime").val()) / 1000;
         var endtime = Date.parse($("input#endtime").val()) / 1000;
         console.log("startime: " + starttime + ", endtime: " + endtime);
         if (starttime < earliest_starttime || endtime > latest_endtime) {
-          alert("We only have data between 2014/05/01 and 2014/06/01.");
+          alert("We only have data between 2014/05/01 and 2014/05/30.");
         }
         else {
           update_map(starttime, endtime);
