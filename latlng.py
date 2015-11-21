@@ -1,12 +1,18 @@
+import sys
+import logging
+import numpy as np
+
 from flask import Flask, request, jsonify, make_response, current_app, \
         render_template
 from datetime import datetime
-import numpy as np
 from bus import bus
 from flask.ext.cors import CORS
 
 app = Flask(__name__)
 app._static_folder = 'static'
+app.logger.addHandler(logging.StreamHandler(sys.stdout))
+app.logger.setLevel(logging.ERROR)
+
 
 cors = CORS(app, resources={r"/latlng/*": {"origins": "*"}})
 
