@@ -68,7 +68,7 @@
     <script>
       function update_map(starttime, endtime){
         var heatMapData = [];
-        $.getJSON("http://localhost:5000/latlng/?starttime=" +
+        $.getJSON("latlng/?starttime=" +
             starttime + "&endtime=" + endtime, function (json) {
           var index;
           var loc;
