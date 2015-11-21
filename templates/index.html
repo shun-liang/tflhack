@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Demo: Tech Hack007</title>
+    <script src="{{ url_for('static',
+        filename='bower_components/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static',
+        filename='bower_components/jquery-ui/jquery-ui.min.js') }}"></script>
+    <script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAMajIdcb4gYYxduwGG4VOLgq7ojcq9UOU&libraries=visualization&sensor=true_or_false">
+    </script>
+    <script>
+      $(function() {
+        $(".datepicker").datepicker();
+      });
+    </script>
+    <link href="{{ url_for('static',
+        filename='bower_components/jquery-ui/themes/base/jquery-ui.min.css') }}" rel="stylesheet" type="text/css"/>
+    <style>
+      #map {
+        width: 700px;
+        margin: 10px auto 25px;
+        height: 500px;
+      }
+      #container-header {
+        max-width: 90%;
+        margin: 0 auto;
+      }
+      #container-main {
+        max-width: 60%;
+        margin: 0 auto;
+      }
+      #container-footer {
+        max-width: 90%;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container-header" class="container">
+      <img id="header-image" src="{{ url_for('static',
+          filename='img/black_bus.png') }}"/>
+      <p id="header-title" style="font-size: 32px">Team Hack 007: Two buses arriving at the same time</p>
+    </div>
+    <div id="map"></div>
+    <div id="container-main" class="container">
+      <form action>
+        <div class="input-group">
+          <span>Start date: </span>
+          <input id="starttime" class="datepicker" type="text">
+        </div> 
+        <div class="input-group">
+          <span>End date: </span>
+          <input id="endtime" class="datepicker" type="text">
+        </div> 
+        <button type="submit" name="submit" id="submit">Submit</button>
+      </form>
+      <div>
+        <img src="{{ url_for('static', filename='img/busesloop.gif') }}" class="img-responsive" alt="Two Buses at the same time">
+      </div>
+    </div>
+    <div id="container-footer" class="container">
+      <h2>Visualise the Frequency of buses arriving at the same time at Bus Stops - Heatmap</h2>
+        <p>We are a team of 10 working together with Rstudio and Jupiter Python</p>
+    </div>
+    <script>
+      function update_map(starttime, endtime){
+        var heatMapData = [];
+        $.getJSON("http://localhost:5000/latlng/?starttime=" +
+            starttime + "&endtime=" + endtime, function (json) {
+          var index;
+          var loc;
+          for (index in json.latlngs) {
+            stop = json.latlngs[index];
+            loc = {location: new google.maps.LatLng(stop.lat, stop.lng), weight: stop.weight};
+            heatMapData.push(loc);
+          }
+          var londonUrbaDataScienceHack = new google.maps.LatLng(51.4470645447, -0.124206586829);
+
+          var map = new google.maps.Map(document.getElementById('map'), {
+            center: londonUrbaDataScienceHack,
+            zoom: 13,
+            mapTypeId: google.maps.MapTypeId.MAP
+          });
+
+          var heatmap = new google.maps.visualization.HeatmapLayer({
+            data: heatMapData
+          });
+
+          var gradient = [
+          'rgba(0, 255, 255, 0)', 'rgba(0, 255, 255, 1)', 'rgba(0, 191, 255, 1)',
+          'rgba(0, 127, 255, 1)', 'rgba(0, 63, 255, 1)', 'rgba(0, 0, 255, 1)',
+          'rgba(0, 0, 223, 1)', 'rgba(0, 0, 191, 1)', 'rgba(0, 0, 159, 1)', 
+          'rgba(0, 0, 127, 1)', 'rgba(63, 0, 91, 1)', 'rgba(127, 0, 63, 1)',
+          'rgba(191, 0, 31, 1)', 'rgba(255, 0, 0, 1)' 
+          ];
+          heatmap.setMap(map, gradient);
+          heatmap.setOptions({
+            opacity: 0.8,
+            radius: 10,
+            dissipating: true,
+            maxIntensity: 2000
+          });
+        });
+      }
+      update_map(Date.parse("2014/05/01") / 1000,
+      Date.parse("2014/05/30") / 1000);
+      $("button#submit").click(function (){
+        var earliest_starttime = Date.parse("2014/05/01") / 1000;
+        var latest_endtime = Date.parse("2014/06/01") / 1000;
+        var starttime = Date.parse($("input#starttime").val()) / 1000;
+        var endtime = Date.parse($("input#endtime").val()) / 1000;
+        console.log("startime: " + starttime + ", endtime: " + endtime);
+        if (starttime < earliest_starttime || endtime > latest_endtime) {
+          alert("We only have data between 2014/05/01 and 2014/06/01.");
+        }
+        else {
+          update_map(starttime, endtime);
+        }
+        return false;
+      });
+  </script>
+  </body>
+</html>
